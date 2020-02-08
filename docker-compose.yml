@@ -1,0 +1,26 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: auth_user
+      POSTGRES_DB: basic_auth
+      POSTGRES_PASS: auth_password
+
+    volumes:
+      - pgdata:/var/lib/posgresql/data
+
+  web:
+    build:
+      context: .
+    ports:
+      - "8008:8008"
+    volumes:
+      - ./basic_auth:/app
+#    command: python manage.py runserver 0.0.0.0:8008
+    command: gunicorn basic_auth.wsgi --user www-data --bind 0.0.0.0:8008 --workers 3
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
